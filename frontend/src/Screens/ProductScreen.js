@@ -1,63 +1,79 @@
-import React from 'react'
-import Data from '../data';
+import React, { useEffect } from 'react'
 import {Link} from 'react-router-dom';
 import Rating from '../components/Rating';
+import { useDispatch, useSelector } from 'react-redux';
+import Messagebox from '../components/MessageBox';
+import LoadingBox from '../components/LoadingBox';
+import { detailsProduct } from '../actions/productActions';
 
 export default function ProductScreen(props) {
-    const product = Data.products.find(x=> x._id === props.match.params.id);
-    console.log(product);
-    if(!product){
-        return <div>Product Not Found</div>
-    }
+    const dispatch = useDispatch();
+    const productId = props.match.params.id;
+    const productDetails = useSelector((state) => state.productDetails);
+    const {loading, error, product} = productDetails;
+    
+    useEffect(() =>{
+        dispatch(detailsProduct(productId));
+    },[ dispatch, productId ]);
     return (
         <div>
-            <Link to="/"> Back to result</Link>
-            <div className="row top">
-                <div className="col-2">
-                    <img src={product.image} alt={product.name}></img>
-                </div>
-                <div className="col-1">
-                    <ul>
-                        <li>
-                            <h1>{product.name}</h1>
-                        </li>
-                        <li>
-                            <Rating 
-                                rating={product.rating} 
-                                numReviews={product.numReviews}>
-                            </Rating>
-                        </li>
-                        <li>
-                            Price:${product.price}
-                        </li>
-                        <li>
-                            Description: <p>{product.description}</p>
-                        </li>
-                    </ul>
-                </div>
-                <div className="col-1">
-                    <div className="card card-body">
+        {loading?( <LoadingBox></LoadingBox>
+        ) :
+        error?(<Messagebox variant="danger">{error}</Messagebox>
+        ) : ( 
+            <div>
+                <Link to="/"> Back to result</Link>
+                <div className="row top">
+                    <div className="col-2">
+                        <img src={product.image} alt={product.name}></img>
+                    </div>
+                    <div className="col-1">
                         <ul>
-                            <div className="row">
-                                <div> Price </div>
-                                <div className="price"> ${product.price}</div>
-                            </div>            
+                            <li>
+                                <h1>{product.name}</h1>
+                            </li>
+                            <li>
+                                <Rating 
+                                    rating={product.rating} 
+                                    numReviews={product.numReviews}>
+                                </Rating>
+                            </li>
+                            <li>
+                                Price:${product.price}
+                            </li>
+                            <li>
+                                Description: <p>{product.description}</p>
+                            </li>
                         </ul>
-                        <ul>
-                            <div className="row">
-                                <div> Status </div>
-                                <div> {product.countInStock? 
-                                    <span className="success">In Stock</span> :
-                                    <span className="danger">Unavailable</span>}
+                    </div>
+                    <div className="col-1">
+                        <div className="card card-body">
+                            <ul>
+                                <div className="row">
+                                    <div> Price </div>
+                                    <div className="price"> ${product.price}</div>
+                                </div>            
+                            </ul>
+                            <ul>
+                                <div className="row">
+                                    <div> Status </div>
+                                    <div> {product.countInStock? 
+                                        <span className="success">In Stock</span> :
+                                        <span className="danger">Unavailable</span>}
+                                    </div>
                                 </div>
-                            </div>
-                        </ul>
-                        <ul>
-                            <button className="primary block">Add to Card</button>
-                        </ul>
+                            </ul>
+                            <ul>
+                                <button className="primary block">Add to Card</button>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        )}
+    </div>
+
+
+
     )
 }
