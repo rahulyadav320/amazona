@@ -9,6 +9,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 mongoose.connect(process.env.MONGDB_URL || 'mongodb://127.0.0.1/amazona', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
